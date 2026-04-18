@@ -15,8 +15,8 @@ CORRECT = '#'
 CLOSE = '*'
 WRONG = '-'
 
-def random_word():
-    return random.choice(VALID_INPUTS)
+def random_word(word_list = VALID_INPUTS):
+    return random.choice(word_list)
 
 def wait_user_input():
     user_input = input("Sua resposta: ").lower()
@@ -115,9 +115,7 @@ def get_remainig_possibilities(attempts):
         possible_words = list(filter(lambda word: filter_wrong_characters(attempt, word), possible_words))
         possible_words = list(filter(lambda word: filter_attempted_word(attempt, word), possible_words))
 
-    print("Possibilidades restantes: ", len(possible_words))
-    for word in possible_words:
-        print(word)
+    return possible_words
 
 
 def start_solver(game_context):
@@ -132,7 +130,10 @@ def start_solver(game_context):
         print("Iniciando solver automático")
 
     while len(game_context['attempts']) < ATTEMPTS_LIMIT:
-        guess = wait_user_input()
+        guess = random_word(get_remainig_possibilities(game_context['attempts']))
+        if mode != 'auto':
+            guess = wait_user_input()
+
         attempt = new_attempt(guess, correct_answer)
         game_context['attempts'].append(attempt)
 
