@@ -72,9 +72,57 @@ def display_feedback(attempts):
         print()
         print()
 
+def filter_correct_characters(attempt, word):
+    for i in range(len(attempt)):
+        if attempt[i][1] == CORRECT:
+            if word[i] != attempt[i][0]: 
+                return False
+            
+    return True
+
+def filter_close_characters(attempt, word):
+    for i in range(len(attempt)):
+        if attempt[i][1] == CLOSE:
+            if attempt[i][0] not in word or word[i] == attempt[i][0]: 
+                return False
+            
+    return True
+
+def filter_wrong_characters(attempt, word):
+    attempted_word = [attempt[i][0] for i in range(len(attempt))]
+    for i in range(len(attempt)):
+        if attempt[i][1] == WRONG:
+            if attempt[i][0] in word: 
+                correct_ocurrences = attempted_word.count(attempt[i][0])
+                if correct_ocurrences == 0:
+                    return False
+                
+    return True
+
+def filter_attempted_word(attempt, word):
+    attempted_word = ''.join([attempt[i][0] for i in range(len(attempt))])
+    if attempted_word == word:
+        return False
+            
+    return True
+
+def get_remainig_possibilities(attempts):
+    possible_words = VALID_INPUTS
+
+    for attempt in attempts:
+        possible_words = list(filter(lambda word: filter_correct_characters(attempt, word), possible_words))
+        possible_words = list(filter(lambda word: filter_close_characters(attempt, word), possible_words))
+        possible_words = list(filter(lambda word: filter_wrong_characters(attempt, word), possible_words))
+        possible_words = list(filter(lambda word: filter_attempted_word(attempt, word), possible_words))
+
+    print("Possibilidades restantes: ", len(possible_words))
+    for word in possible_words:
+        print(word)
+
+
 def start_solver(game_context):
     mode = game_context['mode']
-    correct_answer = 'vagir' # random_word()
+    correct_answer = random_word()
 
     if mode == 'default':
         print("Iniciando solver")
@@ -89,6 +137,9 @@ def start_solver(game_context):
         game_context['attempts'].append(attempt)
 
         display_feedback(game_context['attempts'])
+
+        if mode == 'assisted':
+            get_remainig_possibilities(game_context['attempts'])
 
         if guess == correct_answer:
             print("Parabéns! Você acertou a palavra!")
@@ -106,7 +157,6 @@ def init_config():
 
     game_context = {
         'mode': selected_mode,
-        'remaining_characters': {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'},
         'attempts': [],
     }
     
