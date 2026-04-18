@@ -146,13 +146,39 @@ def start_solver(game_context):
             print("Parabéns! Você acertou a palavra!")
             break
 
+def run_test(n):
+    wins = 0
+ 
+    for i in range(n):
+        correct_answer = random_word()
+        attempts = []
+ 
+        while len(attempts) < ATTEMPTS_LIMIT:
+            guess = random_word(get_remainig_possibilities(attempts))
+            attempt = new_attempt(guess, correct_answer)
+            attempts.append(attempt)
+ 
+            if guess == correct_answer:
+                wins += 1
+                break
+ 
+        print(f"[{i + 1}/{n}] palavra: {correct_answer} | tentativas: {len(attempts)} | {'✓' if guess == correct_answer else '✗'}")
+ 
+    print()
+    print(f"resultado: {wins}/{n} ({(wins / n * 100):.1f}% de acerto)")
+
 
 def init_config():
     parser = argparse.ArgumentParser(description="Termo Solver")
     parser.add_argument('--sanitize', action='store_true', help='gera dicionário de palavras válidas')
     parser.add_argument('--mode', choices=['default', 'assisted', 'auto'], default='default', help='Modo de operação do solver')
+    parser.add_argument('--test', type=int, metavar='N', help='testa a acurácia do solver automático em N partidas')
 
     args = parser.parse_args()
+
+    if args.test:
+        run_test(args.test)
+        return
 
     selected_mode = str(args.mode)
 

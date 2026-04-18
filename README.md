@@ -26,6 +26,10 @@ O solver possui os modos:
 - `assisted`: base do modo assistido (versao inicial).
 - `auto`: tentativas automaticas (versao inicial).
 
+Também é possível executar o teste de acurácia da solução automática com o arg:
+
+- `test`: executa o modo auto N vezes.
+
 ## Como executar
 
 ### 1. Clonar o repositorio
