@@ -37,12 +37,22 @@ def validate_input(input, valid_inputs):
 def new_attempt(guess, correct_answer):
     attempt = []
     for i in range(5):
+        
         if guess[i] == correct_answer[i]:
             attempt.append([guess[i], CORRECT])
-        elif guess[i] in correct_answer:
-            attempt.append([guess[i], CLOSE])
-        else:
+            continue
+        
+        elif guess[i] not in correct_answer:
             attempt.append([guess[i], WRONG])
+            continue
+
+        ocurrences = guess.count(guess[i])
+        correct_ocurrences = correct_answer.count(guess[i])
+        if ocurrences > correct_ocurrences:
+            attempt.append([guess[i], WRONG])
+            continue
+
+        attempt.append([guess[i], CLOSE])
 
     return attempt
 
@@ -64,7 +74,7 @@ def display_feedback(attempts):
 
 def start_solver(game_context):
     mode = game_context['mode']
-    correct_answer = random_word()
+    correct_answer = 'vagir' # random_word()
 
     if mode == 'default':
         print("Iniciando solver")
@@ -96,6 +106,7 @@ def init_config():
 
     game_context = {
         'mode': selected_mode,
+        'remaining_characters': {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'},
         'attempts': [],
     }
     
