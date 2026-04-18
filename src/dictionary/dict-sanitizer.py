@@ -19,11 +19,13 @@ def sanitize_dictionary():
         if len(word) == 5:
             valid_words.append(word)
 
+    valid_words = list(set(valid_words))
+
     print("Total inputs válidos (5 letras)", len(valid_words))
 
     with open(output_path, 'w') as file:
         for word in valid_words:
-            file.write(word)
+            file.write(word.lower())
             if not word == valid_words[-1]:
                 file.write('\n')
 
