@@ -1,4 +1,4 @@
-import os
+﻿import os
 import argparse
 import unicodedata
 import random
@@ -89,14 +89,30 @@ def filter_close_characters(attempt, word):
     return True
 
 def filter_wrong_characters(attempt, word):
-    attempted_word = [attempt[i][0] for i in range(len(attempt))]
-    for i in range(len(attempt)):
-        if attempt[i][1] == WRONG:
-            if attempt[i][0] in word: 
-                correct_ocurrences = attempted_word.count(attempt[i][0])
-                if correct_ocurrences == 0:
-                    return False
-                
+    char_info = {}
+
+    for char, status in attempt:
+        if char not in char_info:
+            char_info[char] = {
+                "min": 0,
+                "total": 0
+            }
+
+        char_info[char]["total"] += 1
+
+        if status in (CORRECT, CLOSE):
+            char_info[char]["min"] += 1
+
+    for char, info in char_info.items():
+        count = word.count(char)
+
+        if count < info["min"]:
+            return False
+
+        if info["total"] > info["min"]:
+            if count > info["min"]:
+                return False
+
     return True
 
 def filter_attempted_word(attempt, word):
@@ -117,6 +133,42 @@ def get_remainig_possibilities(attempts):
 
     return possible_words
 
+def build_frequency(candidates):
+    freq = {}
+    for word in candidates:
+        for c in set(word):
+            freq[c] = freq.get(c, 0) + 1
+    return freq
+
+
+def score_word(word, freq):
+    score = 0
+    used = set()
+
+    for c in word:
+        if c in used:
+            continue
+        score += freq.get(c, 0)
+        used.add(c)
+
+    return score
+
+
+def best_word(candidates):
+    freq = build_frequency(candidates)
+
+    best = None
+    best_score = -1
+
+    for word in candidates:
+        score = score_word(word, freq)
+
+        if score > best_score:
+            best_score = score
+            best = word
+
+    return best
+
 
 def start_solver(game_context):
     mode = game_context['mode']
@@ -130,7 +182,7 @@ def start_solver(game_context):
         print("Iniciando solver automático")
 
     while len(game_context['attempts']) < ATTEMPTS_LIMIT:
-        guess = random_word(get_remainig_possibilities(game_context['attempts']))
+        guess = best_word(get_remainig_possibilities(game_context['attempts']))
         if mode != 'auto':
             guess = wait_user_input()
 
@@ -154,7 +206,8 @@ def run_test(n):
         attempts = []
  
         while len(attempts) < ATTEMPTS_LIMIT:
-            guess = random_word(get_remainig_possibilities(attempts))
+            candidates = get_remainig_possibilities(attempts)
+            guess = best_word(candidates)
             attempt = new_attempt(guess, correct_answer)
             attempts.append(attempt)
  
@@ -162,7 +215,7 @@ def run_test(n):
                 wins += 1
                 break
  
-        print(f"[{i + 1}/{n}] palavra: {correct_answer} | tentativas: {len(attempts)} | {'✓' if guess == correct_answer else '✗'}")
+        print(f"[{i + 1}/{n}] palavra: {correct_answer} | tentativas: {len(attempts)} | {'✓' if guess == correct_answer else '✗'}", end='\r')
  
     print()
     print(f"resultado: {wins}/{n} ({(wins / n * 100):.1f}% de acerto)")
