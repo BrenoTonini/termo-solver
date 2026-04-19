@@ -155,6 +155,9 @@ def score_word(word, freq):
 
 
 def best_word(candidates):
+    if not candidates:
+        return random_word()
+    
     freq = build_frequency(candidates)
 
     best = None
@@ -200,6 +203,8 @@ def start_solver(game_context):
 
 def run_test(n):
     wins = 0
+    wins_by_attempt = {i: 0 for i in range(1, ATTEMPTS_LIMIT + 1)}
+    losses = 0
  
     for i in range(n):
         correct_answer = random_word()
@@ -213,12 +218,19 @@ def run_test(n):
  
             if guess == correct_answer:
                 wins += 1
+                wins_by_attempt[len(attempts)] += 1
                 break
+        else:
+            losses += 1
  
         print(f"[{i + 1}/{n}] palavra: {correct_answer} | tentativas: {len(attempts)} | {'✓' if guess == correct_answer else '✗'}", end='\r')
  
+    print('\n')
+    print(f"resultado: {wins}/{n} ({(wins / n * 100):.1f}% de acerto) | derrotas: {losses}")
     print()
-    print(f"resultado: {wins}/{n} ({(wins / n * 100):.1f}% de acerto)")
+    for attempt_n, count in wins_by_attempt.items():
+        bar = '█' * (count * 20 // max(wins_by_attempt.values(), default=1))
+        print(f"  {attempt_n} tentativa(s): {bar} {count} ({count / n * 100:.1f}%)")
 
 
 def init_config():
