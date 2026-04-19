@@ -36,26 +36,25 @@ def validate_input(input, valid_inputs):
     return True
 
 def new_attempt(guess, correct_answer):
-    attempt = []
+    result = [None] * 5
+    remaining = list(correct_answer)
+        
     for i in range(5):
-        
         if guess[i] == correct_answer[i]:
-            attempt.append([guess[i], CORRECT])
-            continue
+            result[i] = [guess[i], CORRECT]
+            remaining[i] = None
         
-        elif guess[i] not in correct_answer:
-            attempt.append([guess[i], WRONG])
+    for i in range(5):
+        if result[i] is not None:
             continue
 
-        ocurrences = guess.count(guess[i])
-        correct_ocurrences = correct_answer.count(guess[i])
-        if ocurrences > correct_ocurrences:
-            attempt.append([guess[i], WRONG])
-            continue
+        if guess[i] in remaining:
+            result[i] = [guess[i], CLOSE]
+            remaining[remaining.index(guess[i])] = None
+        else:
+            result[i] = [guess[i], WRONG]
 
-        attempt.append([guess[i], CLOSE])
-
-    return attempt
+    return result
 
 def display_feedback(attempts):
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -96,13 +95,13 @@ def filter_wrong_characters(attempt, word):
         if char not in char_info:
             char_info[char] = {
                 "min": 0,
-                "total": 0
+                "has_wrong": False
             }
-
-        char_info[char]["total"] += 1
 
         if status in (CORRECT, CLOSE):
             char_info[char]["min"] += 1
+        elif status == WRONG:
+            char_info[char]["has_wrong"] = True
 
     for char, info in char_info.items():
         count = word.count(char)
@@ -110,9 +109,8 @@ def filter_wrong_characters(attempt, word):
         if count < info["min"]:
             return False
 
-        if info["total"] > info["min"]:
-            if count > info["min"]:
-                return False
+        if info["has_wrong"] and count > info["min"]:
+            return False
 
     return True
 
@@ -239,8 +237,9 @@ def run_test(n):
     print(f"resultado: {wins}/{n} ({(wins / n * 100):.1f}% de acerto) | derrotas: {losses}")
     print(f"tempo médio por partida: {avg_time:.6f}s")
     print()
+    max_wins = max(max(wins_by_attempt.values(), default=0), 1)
     for attempt_n, count in wins_by_attempt.items():
-        bar = '█' * (count * 20 // max(wins_by_attempt.values(), default=1))
+        bar = '█' * (count * 20 // max_wins)
         print(f"  {attempt_n} tentativa(s): {bar} {count} ({count / n * 100:.1f}%)")
 
     if loss_records:
