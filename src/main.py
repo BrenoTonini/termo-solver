@@ -200,16 +200,16 @@ def start_solver(game_context):
             print("Parabéns! Você acertou a palavra!")
             break
 
-def run_test(n):
+def run_test():
     wins = 0
     wins_by_attempt = {i: 0 for i in range(1, ATTEMPTS_LIMIT + 1)}
     losses = 0
     loss_records = []
+    n = len(VALID_INPUTS)
 
     start_time = time.perf_counter()
  
-    for i in range(n):
-        correct_answer = random_word()
+    for i, correct_answer in enumerate(VALID_INPUTS):
         attempts = []
  
         while len(attempts) < ATTEMPTS_LIMIT:
@@ -224,7 +224,7 @@ def run_test(n):
                 break
         else:
             losses += 1
-            guesses = guesses = ', '.join(''.join(c[0] for c in attempt) for attempt in attempts)
+            guesses = ', '.join(''.join(c[0] for c in attempt) for attempt in attempts)
             remaining = len(get_remainig_possibilities(attempts))
             loss_records.append(f"answer: {correct_answer}, attempts: {guesses}, remaining: {remaining}")
  
@@ -255,12 +255,12 @@ def init_config():
     parser = argparse.ArgumentParser(description="Termo Solver")
     parser.add_argument('--sanitize', action='store_true', help='gera dicionário de palavras válidas')
     parser.add_argument('--mode', choices=['default', 'assisted', 'auto'], default='default', help='Modo de operação do solver')
-    parser.add_argument('--test', type=int, metavar='N', help='testa a acurácia do solver automático em N partidas')
+    parser.add_argument('--test', action='store_true', help='testa a acurácia do solver automático em N partidas')
 
     args = parser.parse_args()
 
     if args.test:
-        run_test(args.test)
+        run_test()
         return
 
     selected_mode = str(args.mode)
