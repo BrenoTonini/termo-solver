@@ -2,6 +2,7 @@
 import argparse
 import unicodedata
 import random
+import time
 
 def load_valid_inputs():
     valid_inputs_path = os.path.join(os.path.dirname(__file__), 'dictionary', 'valid-inputs.txt')
@@ -205,6 +206,9 @@ def run_test(n):
     wins = 0
     wins_by_attempt = {i: 0 for i in range(1, ATTEMPTS_LIMIT + 1)}
     losses = 0
+    loss_records = []
+
+    start_time = time.perf_counter()
  
     for i in range(n):
         correct_answer = random_word()
@@ -222,15 +226,30 @@ def run_test(n):
                 break
         else:
             losses += 1
+            guesses = guesses = ', '.join(''.join(c[0] for c in attempt) for attempt in attempts)
+            remaining = len(get_remainig_possibilities(attempts))
+            loss_records.append(f"answer: {correct_answer}, attempts: {guesses}, remaining: {remaining}")
  
         print(f"[{i + 1}/{n}] palavra: {correct_answer} | tentativas: {len(attempts)} | {'✓' if guess == correct_answer else '✗'}", end='\r')
+    
+    total_time = time.perf_counter() - start_time
+    avg_time = total_time / n
  
     print('\n')
     print(f"resultado: {wins}/{n} ({(wins / n * 100):.1f}% de acerto) | derrotas: {losses}")
+    print(f"tempo médio por partida: {avg_time:.6f}s")
     print()
     for attempt_n, count in wins_by_attempt.items():
         bar = '█' * (count * 20 // max(wins_by_attempt.values(), default=1))
         print(f"  {attempt_n} tentativa(s): {bar} {count} ({count / n * 100:.1f}%)")
+
+    if loss_records:
+        losses_dir = os.path.join(os.path.dirname(__file__), 'losses')
+        os.makedirs(losses_dir, exist_ok=True)
+        losses_path = os.path.join(losses_dir, 'losses.txt')
+        with open(losses_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(loss_records))
+        print(f"\nderrotas salvas em: {losses_path}")
 
 
 def init_config():
