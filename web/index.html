@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Termo Solver</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+  <div id="mode-screen" class="screen active">
+    <div class="mode-container">
+      <div class="logo">
+        <span class="logo-bracket">[</span>
+        <span class="logo-text">TERMO</span>
+        <span class="logo-bracket">]</span>
+      </div>
+      <p class="logo-sub">solver & jogo</p>
+
+      <div class="mode-cards">
+        <button class="mode-card" data-mode="play">
+          <span class="mode-icon">▶</span>
+          <span class="mode-title">Jogar</span>
+          <span class="mode-desc">Adivinhe a palavra com 6 tentativas</span>
+        </button>
+        <button class="mode-card" data-mode="assisted">
+          <span class="mode-icon">◈</span>
+          <span class="mode-title">Assistido</span>
+          <span class="mode-desc">Jogue com dicas de melhores candidatas</span>
+        </button>
+        <button class="mode-card" data-mode="solver">
+          <span class="mode-icon">⊞</span>
+          <span class="mode-title">Solver</span>
+          <span class="mode-desc">Digite seus chutes e veja as possibilidades</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="game-screen" class="screen">
+    <header class="top-bar">
+      <button id="back-btn" class="back-btn" aria-label="Voltar">← voltar</button>
+      <span id="mode-label" class="mode-label"></span>
+      <button id="new-game-btn" class="icon-btn" title="Nova partida">↺</button>
+    </header>
+
+    <div class="game-layout">
+      <div class="game-main">
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+        <section id="board" class="board" aria-label="Tabuleiro"></section>
+        <section id="keyboard" class="keyboard" aria-label="Teclado virtual"></section>
+      </div>
+
+      <aside id="hint-panel" class="hint-panel hidden">
+        <div class="hint-header">
+          <span class="hint-title">Palavras possíveis</span>
+          <span id="hint-count" class="hint-count">—</span>
+        </div>
+        <button id="hint-btn" class="hint-btn">Pedir dica</button>
+        <div id="hint-suggestion" class="hint-suggestion hidden">
+          <span class="hint-label">melhor chute:</span>
+          <span id="hint-word" class="hint-word"></span>
+        </div>
+        <ul id="hint-list" class="hint-list"></ul>
+      </aside>
+    </div>
+  </div>
+
+  <div id="solver-screen" class="screen">
+    <header class="top-bar">
+      <button id="solver-back-btn" class="back-btn" aria-label="Voltar">← voltar</button>
+      <span class="mode-label">solver</span>
+      <button id="solver-reset-btn" class="icon-btn" title="Resetar">↺</button>
+    </header>
+
+    <div class="solver-layout">
+      <div class="solver-input-area">
+        <p class="solver-instructions">
+          Digite uma palavra e marque cada letra:<br>
+          <span class="legend"><span class="leg correct">■</span> posição certa</span>
+          <span class="legend"><span class="leg close">■</span> letra existe</span>
+          <span class="legend"><span class="leg wrong">■</span> letra errada</span>
+        </p>
+
+        <div id="solver-row" class="solver-row">
+        </div>
+
+        <div class="solver-controls">
+          <input id="solver-input" class="solver-input" type="text" maxlength="5" placeholder="palavra..." autocomplete="off" autocorrect="off" spellcheck="false">
+          <button id="solver-confirm-btn" class="solver-confirm-btn">Confirmar</button>
+        </div>
+
+        <div id="solver-attempts-list" class="solver-attempts-list"></div>
+      </div>
+
+      <div class="solver-results-area">
+        <div class="results-header">
+          <span class="results-title">Candidatas restantes</span>
+          <span id="results-count" class="hint-count">—</span>
+        </div>
+        <div id="best-suggestion" class="hint-suggestion hidden">
+          <span class="hint-label">melhor próximo chute:</span>
+          <span id="best-word" class="hint-word"></span>
+        </div>
+        <ul id="results-list" class="hint-list results-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="./solver.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
