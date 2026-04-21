@@ -1,17 +1,17 @@
-
 # Termo Solver
 Script em Python para solucionar partidas de [term.ooo](https://term.ooo/), criado como ideia para automatizar e estudar estrategias de resolução do jogo.
 
 ## Sobre o projeto
 Não existe um motivo especial nem uma história mirabolante para esse projeto ter nascido, eu apenas achei que seria legal pensar em uma solução automatizada para partidas de termo.
 
-Atualmente o projeto funciona no terminal e ainda deve passar por modificações, a ideia é melhorar a taxa de sucesso das partidas automaticas mantendo um tempo de resposta rápido.
+O projeto começou como um solver de terminal e evoluiu para uma interface web com três modos de uso distintos.
 
 ## Status atual
 - Versão inicial jogável no terminal.
 - Segunda versão do modo automático.
 - Primeira versão da partida assistida.
 - Teste para avaliar a eficiência e eficácia do algoritmo.
+- Interface web com modos jogar, assistido e solver.
 
 ## Resultado atual
 ~~Em testes locais de pequena escala, a taxa de sucesso observada esta em torno de **~50%**. Isso se deve ao fato de que ainda não existe nenhuma lógica por trás da palavra da próxima tentativa, é apenas uma escolha aleatória.~~
@@ -53,6 +53,8 @@ Ou seja, para ter esse exato mesmo resultado de **94.5%** em menos tempo bastava
 As vezes a vida é dura...
 
 ## Modos de execução
+
+### Terminal
 O solver possui os modos:
 -  `default`: jogo manual no terminal.
 -  `assisted`: base do modo assistido (versao inicial).
@@ -60,50 +62,61 @@ O solver possui os modos:
 
 Também é possível executar o teste de acurácia da solução automática com o arg:
 
--  `test`: executa uma vez com cada palavra disponível no arquivo valid_inputs.txt .
+-  `test`: executa uma vez com cada palavra disponível no arquivo valid_inputs.txt.
+
+### Interface web
+A interface web possui três modos acessíveis pela tela inicial:
+
+- **Jogar**: jogo normal com palavra aleatória, teclado virtual e físico.
+- **Assistido**: mesmo que o modo jogar, com um painel lateral mostrando o número de candidatas restantes e um botão de dica que sugere o melhor próximo chute.
+- **Solver**: você digita suas tentativas com o feedback de uma partida externa (no site, por exemplo). Cada tile pode ser clicado para ciclar entre os estados (errado → existe → certo). Após confirmar, o painel direito exibe as palavras ainda possíveis e o melhor próximo chute.
+
+A lógica do solver (filtragem e pontuação de candidatas) é compartilhada entre os três modos via `solver.js`, que é uma porta direta das funções de `main.py`.
 
 ## Como executar
 
-### 1. Clonar o repositorio
+### Terminal
+
+#### 1. Clonar o repositorio
 ```bash
-
-git  clone <URL_DO_REPOSITORIO>
-
-cd  termo-solver
-
+git clone <URL_DO_REPOSITORIO>
+cd termo-solver
 ```
 
-### 2. Criar e ativar ambiente virtual (opcional, recomendado)
+#### 2. Criar e ativar ambiente virtual (opcional, recomendado)
 Windows (PowerShell):
 ```powershell
-
 python -m venv venv
-
 .\venv\Scripts\Activate.ps1
-
 ```
 
 Linux/macOS:
 ```bash
-
-python3  -m  venv  venv
-
-source  venv/bin/activate
-
+python3 -m venv venv
+source venv/bin/activate
 ```
 
-### 3. Executar
+#### 3. Executar
 ```bash
-
-python  src/main.py  --mode  default
-
-python  src/main.py  --mode  assisted
-
-python  src/main.py  --mode  auto
-
-python  src/main.py  --test
-
+python src/main.py --mode default
+python src/main.py --mode assisted
+python src/main.py --mode auto
+python src/main.py --test
 ```
+
+### Interface web
+
+A interface precisa ser servida via servidor local por conta do carregamento do dicionário.
+
+```bash
+# Python
+python -m http.server 8000
+
+# Node
+npx serve .
+```
+
+Depois acesse `http://localhost:8000/web/` no navegador.
 
 ## Feedback no terminal
 O retorno das letras usa os simbolos:
@@ -120,26 +133,29 @@ Arquivos principais:
 Para regenerar o arquivo de entradas validas:
 
 ```bash
-
-python  src/dictionary/dict-sanitizer.py
-
+python src/dictionary/dict-sanitizer.py
 ```
 
 ## Estrutura do projeto
 ```text
-	src
-	├── dictionary
-	│   ├── dict-ptbr.txt
-	│   ├── dict-sanitizer.py
-	│   └── valid-inputs.txt
-	├── find-strategy.py
-	├── losses
-	│   └── losses.txt
-	└── main.py
+src
+├── dictionary
+│   ├── dict-ptbr.txt
+│   ├── dict-sanitizer.py
+│   └── valid-inputs.txt
+├── losses
+│   └── losses.txt
+├── find-strategy.py
+└── main.py
+web
+├── index.html
+├── styles.css
+├── solver.js
+└── app.js
 ```
 
 ## Roadmap
 - Melhorar a estratégia de escolha de palavras no modo automático.
 - ~~Aumentar a taxa de sucesso acima do baseline atual (90% em 100.000 execuções).~~
 - Refatorar trechos do código para uma melhor performance.
-- Evoluir da interface exclusivamente em terminal para uma interface visual.
+- ~~Evoluir da interface exclusivamente em terminal para uma interface visual.~~
